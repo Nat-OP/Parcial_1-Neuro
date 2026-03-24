@@ -107,8 +107,17 @@ git clone https://github.com/Nat-OP/Parcial_1-Neuro.git
 
 ## 👥 Autores
 
-* [Tu nombre]
+* Alejandra Obando Cortés
+* Maria Alejandra Bocanegra Jaramillo
+* Alejandro Rojas Gómez
+* Rodrigo Garcés Zamora
+* Juan José Ceballos
+* Juan Sebastián Garzón Daza
 * Equipo de trabajo - Neurocontrol 2026
+
+## 🧩 Contribuciones
+
+- Natalia Ortega P.
 
 ---
 
