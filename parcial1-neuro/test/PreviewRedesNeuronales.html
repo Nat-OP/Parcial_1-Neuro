@@ -1,0 +1,698 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:10px 0 12px;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:14px;}
+.dots{display:flex;gap:6px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--color-border-secondary);cursor:pointer;transition:background .2s;}
+.dot.on{background:#534AB7;}
+.navbtns{display:flex;gap:8px;}
+button{font-size:11px;padding:4px 13px;cursor:pointer;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);transition:all .15s;font-family:var(--font-mono);}
+button:hover{background:var(--color-background-secondary);}
+button:disabled{opacity:.3;cursor:default;}
+.pg{display:none;flex-direction:column;gap:12px;}
+.pg.on{display:flex;}
+.chip{display:inline-block;font-family:var(--font-mono);font-size:10px;padding:2px 9px;border-radius:20px;}
+.cp{background:#EEEDFE;color:#3C3489;} .ct{background:#E1F5EE;color:#085041;} .ca{background:#FAEEDA;color:#633806;} .cc{background:#FAECE7;color:#712B13;} .cg{background:#F1EFE8;color:#444441;}
+@media(prefers-color-scheme:dark){.cp{background:#3C3489;color:#CECBF6;}.ct{background:#085041;color:#9FE1CB;}.ca{background:#633806;color:#FAC775;}.cc{background:#712B13;color:#F5C4B3;}.cg{background:#444441;color:#D3D1C7;}}
+.stitle{font-size:17px;font-weight:500;color:var(--color-text-primary);margin-top:4px;line-height:1.3;}
+.ssub{font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-top:3px;}
+canvas{display:block;width:100%;border-radius:10px;}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;}
+.g3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:10px;}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:10px;padding:11px 13px;}
+.card h3{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:5px;}
+.card p{font-size:11px;color:var(--color-text-secondary);line-height:1.65;}
+.cla{border-left:2px solid #534AB7;border-radius:0 10px 10px 0;} .clb{border-left:2px solid #0F6E56;border-radius:0 10px 10px 0;} .clc{border-left:2px solid #993C1D;border-radius:0 10px 10px 0;} .cld{border-left:2px solid #854F0B;border-radius:0 10px 10px 0;}
+pre{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:9px 12px;font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary);line-height:1.9;overflow-x:auto;white-space:pre;}
+.hp{color:#7F77DD;} .ht{color:#1D9E75;} .ha{color:#BA7517;} .hc{color:#D85A30;} .hg{color:var(--color-text-tertiary);}
+@media(prefers-color-scheme:dark){.hp{color:#AFA9EC;}.ht{color:#5DCAA5;}.ha{color:#EF9F27;}.hc{color:#F0997B;}}
+.stato{font-size:12px;font-weight:500;padding:3px 11px;border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-secondary);transition:all .2s;}
+.stato.ok{background:var(--color-background-success);color:var(--color-text-success);}
+.stato.giro{background:var(--color-background-warning);color:var(--color-text-warning);}
+.stato.stop{background:var(--color-background-danger);color:var(--color-text-danger);}
+.eq-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);}
+.eq-row:last-child{border-bottom:none;}
+.eq-badge{flex-shrink:0;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;font-family:var(--font-mono);}
+.eq-body{flex:1;}
+.eq-body .eq-code{font-family:var(--font-mono);font-size:10.5px;color:var(--color-text-primary);line-height:1.7;margin-bottom:4px;}
+.eq-body .eq-explain{font-size:11px;color:var(--color-text-secondary);line-height:1.55;}
+.pill{display:inline-block;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:500;margin:0 1px;}
+.pill-g{background:#E1F5EE;color:#085041;} .pill-r{background:#FAECE7;color:#712B13;} .pill-a{background:#FAEEDA;color:#633806;}
+@media(prefers-color-scheme:dark){.pill-g{background:#085041;color:#9FE1CB;}.pill-r{background:#712B13;color:#F5C4B3;}.pill-a{background:#633806;color:#FAC775;}}
+.srow{display:flex;align-items:center;gap:8px;margin:4px 0;}
+.slbl{font-size:11px;color:var(--color-text-secondary);min-width:115px;}
+.sval{font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary);min-width:28px;text-align:right;}
+input[type=range]{flex:1;min-width:60px;}
+.ctrlrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+</style>
+
+<div class="nav">
+  <div style="display:flex;align-items:center;gap:10px">
+    <span style="font-family:var(--font-mono);font-size:10px;color:#534AB7">NEUROROBOT</span>
+    <div class="dots" id="dots"></div>
+  </div>
+  <div class="navbtns">
+    <button id="bprev" onclick="go(-1)">← prev</button>
+    <button id="bnext" onclick="go(1)">next →</button>
+  </div>
+</div>
+
+<!-- P0: ¿qué es esto? -->
+<div class="pg on" id="p0">
+  <div><span class="chip cg">01 — idea central</span>
+    <div class="stitle">El robot tiene un "sistema nervioso" muy simple</div>
+    <div class="ssub">En lugar de programar reglas como "si hay obstáculo, gira", usamos neuronas artificiales que acumulan señales y producen comportamiento por sí solas.</div>
+  </div>
+  <canvas id="c0" height="200"></canvas>
+  <div class="g3">
+    <div class="card cla">
+      <h3>Una neurona artificial</h3>
+      <p>Es un número entre 0 y 100. Cuando recibe estímulo sube. Cuando no recibe nada, baja lentamente. Igual que una neurona real: se activa y se desactiva.</p>
+    </div>
+    <div class="card clb">
+      <h3>7 neuronas conectadas</h3>
+      <p>Cada una tiene una función: detectar inclinación, detectar obstáculos, memorizar, oscilar... Juntas toman decisiones sin que nadie las programe explícitamente.</p>
+    </div>
+    <div class="card clc">
+      <h3>El resultado: movimiento</h3>
+      <p>La actividad de las neuronas determina cuánta potencia reciben los motores y en qué dirección. Más actividad = más señal a los motores.</p>
+    </div>
+  </div>
+</div>
+
+<!-- P1: la ecuación base -->
+<div class="pg" id="p1">
+  <div><span class="chip cp">02 — la ecuación base</span>
+    <div class="stitle">Todas las neuronas siguen la misma fórmula</div>
+    <div class="ssub">Es una sola ecuación que se repite 7 veces, cambiando solo la entrada y la velocidad de respuesta.</div>
+  </div>
+  <canvas id="c1" height="190"></canvas>
+  <div class="card" style="margin-top:2px">
+    <div style="font-family:var(--font-mono);font-size:13px;color:var(--color-text-primary);padding:8px 0;text-align:center;letter-spacing:.02em">
+      neurona_nueva = neurona_actual + (velocidad) × ( <span class="hc">−neurona_actual</span> + <span class="ht">lo_que_recibe</span> )
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card clc">
+      <h3>Término <span style="color:#D85A30">−neurona_actual</span> → decaimiento</h3>
+      <p>Cada neurona tiende a volver a cero por sí sola. Si nadie la estimula, se apaga. Este término evita que el sistema "se quede pegado" en un valor.</p>
+      <p style="margin-top:6px;font-family:var(--font-mono);font-size:10px;color:var(--color-text-tertiary)">En código: -z[i]</p>
+    </div>
+    <div class="card clb">
+      <h3>Término <span style="color:#1D9E75">lo_que_recibe</span> → activación</h3>
+      <p>Es la suma de todo lo que le llega: señal de sensores, señal de otras neuronas. Si la entrada es mayor que el valor actual, la neurona sube.</p>
+      <p style="margin-top:6px;font-family:var(--font-mono);font-size:10px;color:var(--color-text-tertiary)">En código: Hill(señal) + pesos×otras_neuronas</p>
+    </div>
+  </div>
+  <div class="card cld">
+    <h3>La velocidad de respuesta: τ (tau)</h3>
+    <p>Cada neurona tiene una velocidad diferente. <strong style="color:var(--color-text-primary)">τ pequeño</strong> = reacciona rápido (como un reflejo). <strong style="color:var(--color-text-primary)">τ grande</strong> = reacciona lento (como una memoria). En el código es la constante TAU de cada neurona: z[3] tiene τ=8 (reflejo de frenada), mem6 tiene τ=60 (memoria de terreno).</p>
+  </div>
+</div>
+
+<!-- P2: las 7 neuronas explicadas -->
+<div class="pg" id="p2">
+  <div><span class="chip cp">03 — las 7 neuronas</span>
+    <div class="stitle">Qué hace cada neurona, quién la excita y quién la inhibe</div>
+    <div class="ssub">Verde = excita (suma). Rojo = inhibe (resta). Las flechas del canvas muestran esas conexiones en vivo.</div>
+  </div>
+  <canvas id="c2" height="230"></canvas>
+  <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:10px;padding:10px 14px;">
+    <div class="eq-row">
+      <div class="eq-badge" style="background:#EEEDFE;color:#3C3489;">Z₀</div>
+      <div class="eq-body">
+        <div class="eq-code"><span class="hp">z[0]</span> += (1/25) × ( −z[0] + <span class="ht">Hill(IMU)</span> + <span class="ht">(z[5]+z[6])×0.15</span> )</div>
+        <div class="eq-explain"><span class="pill pill-g">excita</span> señal de inclinación de la IMU · <span class="pill pill-g">excita</span> retroalimentación de las osciladoras · Sin entrada, decae solo · <strong style="color:var(--color-text-primary)">τ=25</strong> — responde en ~25 pasos</div>
+      </div>
+    </div>
+    <div class="eq-row">
+      <div class="eq-badge" style="background:#E1F5EE;color:#085041;">Z₁</div>
+      <div class="eq-body">
+        <div class="eq-code"><span class="ht">z[1]</span> += (1/18) × ( −z[1] + <span class="ht">Hill(100/d1)</span> )</div>
+        <div class="eq-explain"><span class="pill pill-g">excita</span> proximidad del sensor izquierdo. A 1 cm: entrada=100. A 100 cm: entrada=1 · <strong style="color:var(--color-text-primary)">τ=18</strong></div>
+      </div>
+    </div>
+    <div class="eq-row">
+      <div class="eq-badge" style="background:#E1F5EE;color:#085041;">Z₂</div>
+      <div class="eq-body">
+        <div class="eq-code"><span class="ht">z[2]</span> += (1/18) × ( −z[2] + <span class="ht">Hill(100/d2)</span> )</div>
+        <div class="eq-explain">Igual que Z₁ pero para el sensor derecho · <strong style="color:var(--color-text-primary)">τ=18</strong></div>
+      </div>
+    </div>
+    <div class="eq-row">
+      <div class="eq-badge" style="background:#FAECE7;color:#712B13;">Z₃</div>
+      <div class="eq-body">
+        <div class="eq-code"><span class="hc">z[3]</span> += (1/8) × ( −z[3] + <span class="hc">(d≤5cm ? 100 : 0)</span> )</div>
+        <div class="eq-explain"><span class="pill pill-r">sube a 100</span> si cualquier sensor detecta objeto a ≤5 cm · No usa Hill, es binario · <strong style="color:var(--color-text-primary)">τ=8</strong> — el más rápido de la red · Cuando supera 60: STOP total</div>
+      </div>
+    </div>
+    <div class="eq-row">
+      <div class="eq-badge" style="background:#FAEEDA;color:#633806;">Z₄</div>
+      <div class="eq-body">
+        <div class="eq-code"><span class="ha">z[4]</span> += (1/15) × ( −z[4] + <span class="ht">z[0]×0.8</span> + <span class="ht">z[1]×0.4</span> + <span class="ht">z[2]×0.4</span> )</div>
+        <div class="eq-explain"><span class="pill pill-g">excita</span> terreno (peso 0.8) + proximidades (0.4 c/u) · Es el integrador: resume toda la alerta en un solo número · <strong style="color:var(--color-text-primary)">τ=15</strong></div>
+      </div>
+    </div>
+    <div class="eq-row">
+      <div class="eq-badge" style="background:#E6F1FB;color:#0C447C;">Z₅</div>
+      <div class="eq-body">
+        <div class="eq-code">z[5] += (1/12) × ( −z[5] + <span class="ht">mem6×0.6</span> + <span class="ht">z[6]×0.4</span> <span class="hc">− z[4]×0.2</span> )</div>
+        <div class="eq-explain"><span class="pill pill-g">excita</span> memoria larga (0.6) · <span class="pill pill-g">excita</span> la otra osciladora Z₆ (0.4) · <span class="pill pill-r">inhibe</span> el integrador Z₄ (0.2) · Este par crea oscilación porque se excitan mutuamente con distinto τ · <strong style="color:var(--color-text-primary)">τ=12</strong></div>
+      </div>
+    </div>
+    <div class="eq-row">
+      <div class="eq-badge" style="background:#EEEDFE;color:#3C3489;">Z₆</div>
+      <div class="eq-body">
+        <div class="eq-code">z[6] += (1/20) × ( −z[6] + <span class="ht">mem6×0.6</span> + <span class="ht">z[5]×0.4</span> <span class="hc">− z[4]×0.2</span> )</div>
+        <div class="eq-explain">Misma estructura que Z₅ pero <strong style="color:var(--color-text-primary)">τ=20</strong> (más lenta). La diferencia de τ entre Z₅ y Z₆ es lo que genera la oscilación: una sube antes, la otra después, y se arrastran mutuamente.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- P3: Hill y memoria -->
+<div class="pg" id="p3">
+  <div><span class="chip ct">04 — Hill y memoria</span>
+    <div class="stitle">La función Hill y la memoria de terreno</div>
+    <div class="ssub">Hill convierte señales crudas en activación suave. La memoria guarda que el terreno fue rugoso, aunque ya no lo sea.</div>
+  </div>
+  <canvas id="c3" height="210"></canvas>
+  <div class="g2">
+    <div>
+      <div class="card cla" style="margin-bottom:10px">
+        <h3>Función Hill — por qué no es lineal</h3>
+        <p>Si la señal es pequeña, la neurona apenas responde. Al cruzar un umbral, la respuesta sube rápido y satura en 100. Esto evita que el robot reaccione a ruido, pero sí reacciona a señales reales.</p>
+        <p style="margin-top:6px;font-family:var(--font-mono);font-size:10px;color:var(--color-text-tertiary)">f(x) = 100 · x² / (120² + x²)</p>
+      </div>
+      <div class="card clc">
+        <h3>Proximidad = 100 / distancia</h3>
+        <p>La entrada a Hill no es la distancia directamente, sino su inversa. A 100 cm la señal es 1 (casi nada). A 5 cm es 20. A 1 cm es 100. El robot "siente" el peligro de forma proporcional.</p>
+      </div>
+    </div>
+    <div class="card clb" style="align-self:start">
+      <h3>mem6 — la memoria de terreno</h3>
+      <p>mem6 sigue a Z₀ con τ=60, el más lento de la red. Cuando el robot pasa por terreno rugoso, Z₀ sube rápido pero mem6 lo registra y tarda mucho en bajar.</p>
+      <p style="margin-top:8px">Esto significa que aunque el terreno vuelva a ser plano, la red "recuerda" durante un rato que hubo rugosidad y mantiene las osciladoras activas.</p>
+      <p style="margin-top:8px;font-family:var(--font-mono);font-size:10px;color:var(--color-text-tertiary)">mem6 += (1/60) × (−mem6 + normaliza(z[0])×100)</p>
+      <p style="margin-top:8px">normaliza(z[0]) = z[0]/(z[0]+1) — convierte el valor en un número entre 0 y 1 antes de pasar a la memoria.</p>
+    </div>
+  </div>
+</div>
+
+<!-- P4: red → motores -->
+<div class="pg" id="p4">
+  <div><span class="chip ca">05 — red → motores</span>
+    <div class="stitle">Cómo las neuronas mueven los motores</div>
+    <div class="ssub">Las neuronas no dan órdenes directas. Determinan el estado del robot, y el estado decide el patrón de motores.</div>
+  </div>
+  <canvas id="c4" height="200"></canvas>
+  <div class="card" style="margin-top:2px">
+    <h3 style="margin-bottom:10px">Regla de decisión</h3>
+    <div class="eq-row">
+      <div class="eq-badge" style="background:#FAECE7;color:#712B13;font-size:10px;">Z₃>60</div>
+      <div class="eq-body">
+        <div class="eq-code"><span class="hc">STOP total</span> — setMotores(0, 0)</div>
+        <div class="eq-explain">Prioridad absoluta. Si Z₃ supera 60, todo lo demás se ignora y los 4 motores paran. No importa en qué estado esté el robot.</div>
+      </div>
+    </div>
+    <div class="eq-row">
+      <div class="eq-badge" style="background:#E1F5EE;color:#085041;font-size:9px;">RECTO</div>
+      <div class="eq-body">
+        <div class="eq-code"><span class="ht">setCrucero()</span> — setMotores(<span class="ht">150</span>, <span class="ht">150</span>)</div>
+        <div class="eq-explain">Sin inclinación → avanza recto. Ambos lados al mismo PWM. Si detecta inclinación → cambia a GIRANDO.</div>
+      </div>
+    </div>
+    <div class="eq-row">
+      <div class="eq-badge" style="background:#FAEEDA;color:#633806;font-size:9px;">GIRO</div>
+      <div class="eq-body">
+        <div class="eq-code"><span class="ha">setGiroEje()</span> — setMotores(<span class="ht">+200</span>, <span class="hc">−200</span>)</div>
+        <div class="eq-explain">Izquierda adelante, derecha atrás → gira sobre su propio eje. Mide el ángulo girado con el giroscopio. Al llegar a 45° pasa a CRUCERO RUGOSO.</div>
+      </div>
+    </div>
+    <div class="eq-row" style="border-bottom:none">
+      <div class="eq-badge" style="background:#EEEDFE;color:#3C3489;font-size:8px;">RUGOSO</div>
+      <div class="eq-body">
+        <div class="eq-code"><span class="ht">setCrucero()</span> — setMotores(<span class="ht">150</span>, <span class="ht">150</span>)</div>
+        <div class="eq-explain">Avanza aunque el terreno sea rugoso. Cuando la IMU deja de detectar inclinación, vuelve a RECTO.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- P5: simulador -->
+<div class="pg" id="p5">
+  <div><span class="chip cg">06 — simulador</span>
+    <div class="stitle">Red neuronal en vivo</div>
+    <div class="ssub">Mueve los sliders y observa cómo las neuronas se activan, se inhiben y mueven los motores. Prueba bajar la distancia a 3 cm.</div>
+  </div>
+  <canvas id="c5" height="255"></canvas>
+  <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px">
+    <div class="srow"><span class="slbl">IMU — inclinación (0–55)</span><input type="range" id="s5-imu" min="0" max="55" value="0" step="1"><span class="sval" id="v5-imu">0</span></div>
+    <div class="srow"><span class="slbl">Distancia sensor 1 (cm)</span><input type="range" id="s5-d1" min="1" max="200" value="100" step="1"><span class="sval" id="v5-d1">100</span></div>
+    <div class="srow"><span class="slbl">Distancia sensor 2 (cm)</span><input type="range" id="s5-d2" min="1" max="200" value="100" step="1"><span class="sval" id="v5-d2">100</span></div>
+  </div>
+  <div class="ctrlrow">
+    <button id="b5reset">reiniciar red</button>
+    <span id="s5estado" class="stato ok">OPERATIVO — RECTO</span>
+  </div>
+</div>
+
+<script>
+const NP=6; let cur=0;
+const dotsEl=document.getElementById('dots');
+for(let i=0;i<NP;i++){const d=document.createElement('div');d.className='dot'+(i===0?' on':'');d.onclick=()=>goTo(i);dotsEl.appendChild(d);}
+function goTo(n){document.getElementById('p'+cur).classList.remove('on');dotsEl.children[cur].classList.remove('on');cur=Math.max(0,Math.min(NP-1,n));document.getElementById('p'+cur).classList.add('on');dotsEl.children[cur].classList.add('on');document.getElementById('bprev').disabled=cur===0;document.getElementById('bnext').disabled=cur===NP-1;}
+function go(d){goTo(cur+d);}
+document.getElementById('bprev').disabled=true;
+
+const isDark=()=>window.matchMedia('(prefers-color-scheme:dark)').matches;
+const getBg=()=>isDark()?'#0e1117':'#f4f3f0';
+const getWire=()=>isDark()?'#3a3a3a':'#c8c8c8';
+
+const PAL={
+  imu:{fill:'#378ADD',stroke:'#185FA5',text:'#E6F1FB'},
+  us1:{fill:'#1D9E75',stroke:'#0F6E56',text:'#E1F5EE'},
+  us2:{fill:'#1D9E75',stroke:'#0F6E56',text:'#E1F5EE'},
+  z0:{fill:'#7F77DD',stroke:'#534AB7',text:'#EEEDFE'},
+  z1:{fill:'#5DCAA5',stroke:'#0F6E56',text:'#04342C'},
+  z2:{fill:'#5DCAA5',stroke:'#0F6E56',text:'#04342C'},
+  z3:{fill:'#E24B4A',stroke:'#A32D2D',text:'#FCEBEB'},
+  z4:{fill:'#EF9F27',stroke:'#BA7517',text:'#412402'},
+  z5:{fill:'#378ADD',stroke:'#185FA5',text:'#E6F1FB'},
+  z6:{fill:'#534AB7',stroke:'#3C3489',text:'#EEEDFE'},
+  mem:{fill:'#D4537E',stroke:'#993556',text:'#FBEAF0'},
+  mi:{fill:'#639922',stroke:'#3B6D11',text:'#EAF3DE'},
+  md:{fill:'#639922',stroke:'#3B6D11',text:'#EAF3DE'},
+};
+
+let Z=[0,0,0,0,0,0,0],MEM=0;
+const DT=10,AN=100,BN=120,TAUs=[25,18,18,8,15,12,20];
+function hill(x){return(AN*x*x)/(BN*BN+x*x);}
+function cl(v){return Math.max(0,Math.min(100,v));}
+
+function neuroStep(imu,d1,d2){
+  const z=Z,cierre=(z[5]+z[6])*0.15;
+  z[0]+=(DT/TAUs[0])*(-z[0]+hill(imu)+cierre);
+  const sL=100/Math.max(d1,.1),sR=100/Math.max(d2,.1);
+  z[1]+=(DT/TAUs[1])*(-z[1]+hill(sL));
+  z[2]+=(DT/TAUs[2])*(-z[2]+hill(sR));
+  z[3]+=(DT/TAUs[3])*(-z[3]+((d1<=5||d2<=5)?100:0));
+  MEM+=(DT/60)*(-MEM+(z[0]/(z[0]+1))*100);
+  z[4]+=(DT/TAUs[4])*(-z[4]+z[0]*.8+z[1]*.4+z[2]*.4);
+  z[5]+=(DT/TAUs[5])*(-z[5]+MEM*.6+z[6]*.4-z[4]*.2);
+  z[6]+=(DT/TAUs[6])*(-z[6]+MEM*.6+z[5]*.4-z[4]*.2);
+  for(let i=0;i<7;i++)Z[i]=cl(z[i]);
+  MEM=cl(MEM);
+}
+
+let simYaw=0,simYawStart=0,robotState='RECTO';
+function getVizq(){if(Z[3]>60)return 0;if(robotState==='GIRANDO')return 200;return 150;}
+function getVder(){if(Z[3]>60)return 0;if(robotState==='GIRANDO')return-200;return 150;}
+
+function getP5(){
+  const imu=+(document.getElementById('s5-imu')||{value:0}).value;
+  const d1=+(document.getElementById('s5-d1')||{value:100}).value;
+  const d2=+(document.getElementById('s5-d2')||{value:100}).value;
+  try{document.getElementById('v5-imu').textContent=imu;document.getElementById('v5-d1').textContent=d1;document.getElementById('v5-d2').textContent=d2;}catch(e){}
+  return{imu,d1,d2};
+}
+['s5-imu','s5-d1','s5-d2'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',getP5);});
+
+const allPulses={};let pTimer=0;
+function spawnFor(cid,imu,d1,d2){
+  if(!allPulses[cid])allPulses[cid]=[];
+  const P=allPulses[cid];pTimer++;
+  function add(f,t,color,delay=0){P.push({from:f,to:t,color,p:-delay*0.003,spd:0.017});}
+  if(pTimer%16===0){if(imu>0)add('imu','z0',PAL.imu.fill);if(d1<150)add('us1','z1',PAL.us1.fill);if(d2<150)add('us2','z2',PAL.us2.fill);}
+  if(pTimer%22===0&&Z[0]>15){add('z0','z4',PAL.z0.fill);add('z0','mem',PAL.z0.fill,8);}
+  if(pTimer%20===0&&Z[1]>15)add('z1','z4',PAL.z1.fill);
+  if(pTimer%20===0&&Z[2]>15)add('z2','z4',PAL.z2.fill);
+  if(pTimer%16===0&&(d1<=5||d2<=5)){add('z3','mi','#E24B4A');add('z3','md','#E24B4A',5);}
+  if(pTimer%26===0&&MEM>10){add('mem','z5',PAL.mem.fill);add('mem','z6',PAL.mem.fill,10);}
+  if(pTimer%30===0&&MEM>15){add('z5','z6',PAL.z5.fill);add('z6','z5',PAL.z6.fill,14);}
+  if(pTimer%22===0){if(getVizq()>0)add('z5','mi',PAL.mi.fill);if(Math.abs(getVder())>0)add('z6','md',PAL.md.fill);}
+  for(let i=P.length-1;i>=0;i--){P[i].p+=P[i].spd;if(P[i].p>1.1)P.splice(i,1);}
+}
+
+function getAct(k,imu,d1,d2){
+  switch(k){
+    case 'imu':return imu/55*100;case 'us1':return Math.max(0,100-d1/2);case 'us2':return Math.max(0,100-d2/2);
+    case 'z0':return Z[0];case 'z1':return Z[1];case 'z2':return Z[2];case 'z3':return Z[3];
+    case 'z4':return Z[4];case 'z5':return Z[5];case 'z6':return Z[6];case 'mem':return MEM;
+    case 'mi':return getVizq()/2.55;case 'md':return Math.abs(getVder())/2.55;default:return 0;
+  }
+}
+
+function drawNode(ctx,n,pal,act){
+  const alpha=0.25+0.75*Math.min(1,act/80);
+  ctx.save();
+  if(act>12){ctx.shadowColor=pal.fill;ctx.shadowBlur=13*(act/100);}
+  ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+  ctx.fillStyle=pal.fill+Math.round(alpha*255).toString(16).padStart(2,'0');
+  ctx.fill();ctx.strokeStyle=pal.stroke;ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
+  ctx.fillStyle=pal.text;ctx.font='500 11px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(n.label,n.x,n.y-5);
+  ctx.font='400 9px sans-serif';ctx.fillStyle=pal.text+'bb';ctx.fillText(n.sub,n.x,n.y+6);
+}
+
+function drawWire(ctx,a,b,opts={}){
+  const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy);
+  const nx=dx/len,ny=dy/len;
+  const sx=a.x+nx*a.r,sy=a.y+ny*a.r,ex=b.x-nx*b.r,ey=b.y-ny*b.r;
+  ctx.save();ctx.beginPath();
+  if(opts.curve){ctx.moveTo(sx,sy);ctx.bezierCurveTo(sx+opts.curve[0],sy+opts.curve[1],ex+opts.curve[2],ey+opts.curve[3],ex,ey);}
+  else{ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);}
+  ctx.strokeStyle=opts.color||getWire();ctx.lineWidth=opts.w||1;ctx.setLineDash(opts.dash||[]);ctx.globalAlpha=opts.alpha||0.4;ctx.stroke();
+  if(!opts.noArrow){
+    const angle=Math.atan2(ey-sy,ex-sx);
+    ctx.globalAlpha=opts.alpha||0.4;ctx.beginPath();
+    ctx.moveTo(ex,ey);ctx.lineTo(ex-7*Math.cos(angle-.4),ey-7*Math.sin(angle-.4));
+    ctx.moveTo(ex,ey);ctx.lineTo(ex-7*Math.cos(angle+.4),ey-7*Math.sin(angle+.4));
+    ctx.strokeStyle=opts.color||getWire();ctx.lineWidth=1;ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawPulses(ctx,cid,nm){
+  const P=allPulses[cid]||[];
+  for(const p of P){
+    if(p.p<0||p.p>1)continue;
+    const a=nm[p.from],b=nm[p.to];if(!a||!b)continue;
+    const x=a.x+(b.x-a.x)*p.p,y=a.y+(b.y-a.y)*p.p;
+    ctx.save();ctx.shadowColor=p.color;ctx.shadowBlur=8;
+    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fillStyle=p.color;ctx.globalAlpha=1-Math.abs(p.p-.5)*.4;ctx.fill();ctx.restore();
+  }
+}
+
+function drawBars(ctx,W,H){
+  const vals=[{lbl:'Z₀',v:Z[0],c:'#7F77DD'},{lbl:'Z₁',v:Z[1],c:'#1D9E75'},{lbl:'Z₂',v:Z[2],c:'#1D9E75'},{lbl:'Z₃',v:Z[3],c:'#E24B4A'},{lbl:'Z₄',v:Z[4],c:'#EF9F27'},{lbl:'Z₅',v:Z[5],c:'#378ADD'},{lbl:'Z₆',v:Z[6],c:'#534AB7'},{lbl:'MEM',v:MEM,c:'#D4537E'}];
+  const by=H-36,bh=10,mg=14,gap=3,cw=(W-mg*2-gap*(vals.length-1))/vals.length;
+  ctx.font='9px sans-serif';ctx.textBaseline='top';
+  vals.forEach((v,i)=>{
+    const bx=mg+i*(cw+gap);
+    ctx.fillStyle=isDark()?'#1a2235':'#ddd';ctx.fillRect(bx,by,cw,bh);
+    ctx.fillStyle=v.c;ctx.fillRect(bx,by,(v.v/100)*cw,bh);
+    ctx.strokeStyle=v.c;ctx.lineWidth=0.5;ctx.strokeRect(bx,by,cw,bh);
+    ctx.fillStyle=isDark()?'#aaa':'#666';ctx.textAlign='center';ctx.fillText(v.lbl,bx+cw/2,by+bh+3);
+    ctx.fillStyle=isDark()?'#eee':'#222';ctx.fillText(v.v.toFixed(0),bx+cw/2,by-10);
+  });
+}
+
+function rr(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
+function drawMotorPanel(ctx,W,H,vI,vD){
+  function mbox(cx,cy,v,dir,lbl){
+    const bw=64,bh=30;
+    ctx.fillStyle=v===0?(isDark()?'#1e2a38':'#ddd'):dir<0?'#712B13':'#085041';
+    ctx.strokeStyle=v===0?getWire():dir<0?'#F0997B':'#5DCAA5';
+    ctx.lineWidth=1;rr(ctx,cx-bw/2,cy-bh/2,bw,bh,6);ctx.fill();ctx.stroke();
+    const tc=v===0?(isDark()?'#888':'#666'):dir<0?'#F5C4B3':'#9FE1CB';
+    ctx.fillStyle=tc;ctx.font='500 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText((dir<0?'←':v>0?'→':'—')+' '+Math.abs(v),cx,cy-5);
+    ctx.font='400 9px sans-serif';ctx.fillText(lbl,cx,cy+6);
+  }
+  mbox(W-44,H-108,vI,1,'M₁ izq');
+  mbox(W-44,H-68,Math.abs(vD),vD,'M₂ der');
+}
+
+function wA(k,imu,d1,d2){return Math.min(1,.2+.8*(getAct(k,imu,d1,d2)/100));}
+
+function drawDash(ctx,x,y,w,h,lbl){
+  ctx.save();ctx.setLineDash([4,3]);ctx.strokeStyle=isDark()?'#334':'#ccc';ctx.lineWidth=0.5;ctx.strokeRect(x,y,w,h);
+  ctx.font='9px sans-serif';ctx.fillStyle=isDark()?'#445':'#bbb';ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText(lbl,x+4,y+3);ctx.restore();
+}
+function drawOscArc(ctx,x,y,r){
+  ctx.save();ctx.beginPath();ctx.arc(x,y,r,-Math.PI*.6,Math.PI*.6);
+  ctx.strokeStyle=isDark()?'#2a3a4a':'#ddd';ctx.lineWidth=1;ctx.setLineDash([3,4]);ctx.stroke();ctx.restore();
+}
+
+function annotate(ctx,x,y,txt,color){
+  ctx.save();ctx.font='9px sans-serif';ctx.fillStyle=color;ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText(txt,x,y);ctx.restore();
+}
+
+function drawInhibitLine(ctx,a,b,opts={}){
+  drawWire(ctx,a,b,{color:'#E24B4A',w:1,dash:[4,3],...opts});
+  const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy),nx=dx/len,ny=dy/len;
+  const ex=b.x-nx*b.r,ey=b.y-ny*b.r;
+  ctx.save();ctx.beginPath();ctx.arc(ex,ey,4,0,Math.PI*2);
+  ctx.fillStyle='#E24B4A';ctx.globalAlpha=(opts.alpha||0.4)+.2;ctx.fill();ctx.restore();
+}
+
+function makeCanvas(id){
+  const c=document.getElementById(id);if(!c)return{ctx:null,W:700,H:200};
+  c.width=700;return{ctx:c.getContext('2d'),W:700,H:c.height};
+}
+
+function drawPage0(imu,d1,d2){
+  const{ctx,W,H}=makeCanvas('c0');if(!ctx)return;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=getBg();ctx.fillRect(0,0,W,H);
+  const NM={
+    imu:{x:70,y:90,r:24,label:'IMU',sub:'inclinación'},
+    us1:{x:70,y:155,r:24,label:'US',sub:'distancia'},
+    z0:{x:220,y:90,r:24,label:'Z₀',sub:'terreno'},
+    z3:{x:360,y:155,r:26,label:'Z₃',sub:'STOP'},
+    z5:{x:490,y:90,r:24,label:'Z₅',sub:'oscilador'},
+    mi:{x:630,y:90,r:26,label:'Motor',sub:'izq+der'},
+  };
+  drawDash(ctx,44,64,110,112,'sensores');
+  ctx.save();ctx.setLineDash([4,3]);ctx.strokeStyle=isDark()?'#334':'#ccc';ctx.lineWidth=0.5;ctx.strokeRect(600,62,66,56);
+  ctx.font='9px sans-serif';ctx.fillStyle=isDark()?'#445':'#bbb';ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText('motores',604,65);ctx.restore();
+  drawWire(ctx,NM.imu,NM.z0,{color:PAL.imu.fill,w:1.5,alpha:wA('imu',imu,d1,d2)});
+  drawWire(ctx,NM.us1,NM.z3,{color:PAL.us1.fill,w:1.5,alpha:wA('us1',imu,d1,d2)});
+  drawWire(ctx,NM.z0,NM.z5,{color:PAL.z0.fill,w:1.2,alpha:wA('z0',imu,d1,d2)});
+  drawWire(ctx,NM.z5,NM.mi,{color:PAL.mi.fill,w:2,alpha:wA('z5',imu,d1,d2)});
+  drawInhibitLine(ctx,NM.z3,NM.mi,{alpha:wA('z3',imu,d1,d2)});
+  annotate(ctx,(NM.imu.x+NM.z0.x)/2,NM.imu.y-18,'excita →',isDark()?'#5DCAA5':'#0F6E56');
+  annotate(ctx,(NM.z3.x+NM.mi.x)/2,NM.z3.y-18,'inhibe ⊣',isDark()?'#F0997B':'#D85A30');
+  drawPulses(ctx,'c0',NM);
+  Object.keys(NM).forEach(k=>drawNode(ctx,NM[k],PAL[k]||PAL.z0,getAct(k,imu,d1,d2)));
+  drawBars(ctx,W,H);
+}
+
+function drawPage1(imu,d1,d2){
+  const{ctx,W,H}=makeCanvas('c1');if(!ctx)return;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=getBg();ctx.fillRect(0,0,W,H);
+  const NM={
+    sensor:{x:80,y:88,r:26,label:'Sensor',sub:'cualquiera'},
+    neurona:{x:350,y:88,r:30,label:'Neurona',sub:'z[i]'},
+    salida:{x:600,y:88,r:26,label:'Salida',sub:'0–100'},
+  };
+  const act=Math.min(100,Z[0]+Z[1]+Z[3]);
+  drawWire(ctx,NM.sensor,NM.neurona,{color:'#1D9E75',w:1.5,alpha:.6});
+  drawWire(ctx,NM.neurona,NM.salida,{color:PAL.z0.fill,w:1.5,alpha:.6});
+  annotate(ctx,(NM.sensor.x+NM.neurona.x)/2,NM.sensor.y-18,'lo_que_recibe',isDark()?'#5DCAA5':'#0F6E56');
+  annotate(ctx,(NM.neurona.x+NM.salida.x)/2,NM.neurona.y-18,'valor actualizado',isDark()?'#AFA9EC':'#534AB7');
+  ctx.save();
+  ctx.fillStyle=isDark()?'#1a2235':'#ececea';ctx.strokeStyle=isDark()?'#2a3340':'#ccc';ctx.lineWidth=0.5;
+  rr(ctx,170,120,360,36,8);ctx.fill();ctx.stroke();
+  ctx.font='11px sans-serif';ctx.fillStyle=isDark()?'#ccc':'#444';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('decaimiento (−z) + activación (entrada) → balance',350,138);
+  ctx.restore();
+  drawNode(ctx,NM.sensor,PAL.us1,60);
+  drawNode(ctx,NM.neurona,PAL.z0,act);
+  drawNode(ctx,NM.salida,PAL.z5,act*.8);
+  drawBars(ctx,W,H);
+}
+
+function drawPage2(imu,d1,d2){
+  const{ctx,W,H}=makeCanvas('c2');if(!ctx)return;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=getBg();ctx.fillRect(0,0,W,H);
+  const NM={
+    imu:{x:52,y:80,r:20,label:'IMU',sub:''},
+    us1:{x:52,y:135,r:20,label:'US1',sub:''},
+    us2:{x:52,y:188,r:20,label:'US2',sub:''},
+    z0:{x:175,y:80,r:22,label:'Z₀',sub:''},
+    z1:{x:175,y:135,r:20,label:'Z₁',sub:''},
+    z2:{x:175,y:188,r:20,label:'Z₂',sub:''},
+    z3:{x:295,y:162,r:24,label:'Z₃',sub:'STOP'},
+    z4:{x:295,y:80,r:20,label:'Z₄',sub:'conv.'},
+    mem:{x:415,y:50,r:22,label:'MEM',sub:'τ=60'},
+    z5:{x:520,y:80,r:22,label:'Z₅',sub:'τ=12'},
+    z6:{x:520,y:162,r:22,label:'Z₆',sub:'τ=20'},
+    mi:{x:635,y:80,r:22,label:'M₁',sub:'izq'},
+    md:{x:635,y:162,r:22,label:'M₂',sub:'der'},
+  };
+  drawDash(ctx,28,55,102,152,'sensores');
+  drawOscArc(ctx,520,121,62);
+  const ww=(a,b)=>Math.min(1,.2+.8*(getAct(a,imu,d1,d2)/100));
+  drawWire(ctx,NM.imu,NM.z0,{color:PAL.imu.fill,w:1.5,alpha:wA('imu',imu,d1,d2)});
+  drawWire(ctx,NM.us1,NM.z1,{color:PAL.us1.fill,w:1.5,alpha:wA('us1',imu,d1,d2)});
+  drawWire(ctx,NM.us2,NM.z2,{color:PAL.us2.fill,w:1.5,alpha:wA('us2',imu,d1,d2)});
+  drawWire(ctx,NM.z0,NM.z4,{color:PAL.z0.fill,w:1.2,alpha:wA('z0',imu,d1,d2)});
+  drawWire(ctx,NM.z1,NM.z4,{color:PAL.z1.fill,w:1,alpha:wA('z1',imu,d1,d2)});
+  drawWire(ctx,NM.z2,NM.z4,{color:PAL.z2.fill,w:1,alpha:wA('z2',imu,d1,d2)});
+  drawWire(ctx,NM.z1,NM.z3,{color:PAL.z1.fill,w:1,alpha:wA('z1',imu,d1,d2)});
+  drawWire(ctx,NM.z2,NM.z3,{color:PAL.z2.fill,w:1,alpha:wA('z2',imu,d1,d2)});
+  drawWire(ctx,NM.z0,NM.mem,{color:PAL.z0.fill,w:1.2,alpha:wA('z0',imu,d1,d2)});
+  drawWire(ctx,NM.mem,NM.z5,{color:PAL.mem.fill,w:1.2,alpha:wA('mem',imu,d1,d2)});
+  drawWire(ctx,NM.mem,NM.z6,{color:PAL.mem.fill,w:1.2,alpha:wA('mem',imu,d1,d2)});
+  drawWire(ctx,NM.z5,NM.mi,{color:PAL.mi.fill,w:2,alpha:wA('z5',imu,d1,d2)});
+  drawWire(ctx,NM.z6,NM.md,{color:PAL.md.fill,w:2,alpha:wA('z6',imu,d1,d2)});
+  drawInhibitLine(ctx,NM.z3,NM.mi,{alpha:wA('z3',imu,d1,d2)});
+  drawInhibitLine(ctx,NM.z3,NM.md,{alpha:wA('z3',imu,d1,d2)});
+  drawInhibitLine(ctx,NM.z4,NM.z5,{alpha:wA('z4',imu,d1,d2)});
+  drawInhibitLine(ctx,NM.z4,NM.z6,{alpha:wA('z4',imu,d1,d2)});
+  drawWire(ctx,NM.z5,NM.z6,{color:PAL.z5.fill,w:1,curve:[28,32,-28,-32],alpha:.3});
+  drawWire(ctx,NM.z6,NM.z5,{color:PAL.z6.fill,w:1,curve:[-28,-32,28,32],alpha:.3,noArrow:true});
+  ctx.save();ctx.font='8px sans-serif';ctx.fillStyle=isDark()?'#5DCAA5':'#0F6E56';ctx.textAlign='center';
+  ctx.fillText('excita',122,58);ctx.fillText('excita',122,113);ctx.fillText('excita',122,168);
+  ctx.fillStyle=isDark()?'#F0997B':'#D85A30';
+  ctx.fillText('inhibe',397,72);ctx.fillText('inhibe',397,148);ctx.restore();
+  drawPulses(ctx,'c2',NM);
+  Object.keys(NM).forEach(k=>drawNode(ctx,NM[k],PAL[k]||PAL.z0,getAct(k,imu,d1,d2)));
+  drawBars(ctx,W,H);
+}
+
+function drawPage3(imu,d1,d2){
+  const{ctx,W,H}=makeCanvas('c3');if(!ctx)return;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=getBg();ctx.fillRect(0,0,W,H);
+  const NM={
+    us1:{x:60,y:100,r:22,label:'US',sub:'3 cm'},
+    z1:{x:200,y:100,r:22,label:'Z₁',sub:'prox.'},
+    hill:{x:360,y:100,r:24,label:'Hill',sub:'f(x)'},
+    z0:{x:510,y:100,r:22,label:'Z₀',sub:'terreno'},
+    mem:{x:640,y:100,r:22,label:'MEM',sub:'τ=60'},
+  };
+  drawWire(ctx,NM.us1,NM.z1,{color:PAL.us1.fill,w:1.5,alpha:.7});
+  drawWire(ctx,NM.z1,NM.hill,{color:PAL.z1.fill,w:1.5,alpha:.7});
+  drawWire(ctx,NM.hill,NM.z0,{color:PAL.z0.fill,w:1.5,alpha:.7});
+  drawWire(ctx,NM.z0,NM.mem,{color:PAL.mem.fill,w:1.5,alpha:.7});
+  annotate(ctx,130,78,'100/d',isDark()?'#5DCAA5':'#0F6E56');
+  annotate(ctx,280,78,'x²/(120²+x²)',isDark()?'#AFA9EC':'#534AB7');
+  annotate(ctx,575,78,'z/(z+1)·100',isDark()?'#D4537E':'#993556');
+
+  const hx=200,hy=140,hw=300,hh=60;
+  ctx.save();
+  ctx.fillStyle=isDark()?'#141c28':'#ececea';ctx.strokeStyle=isDark()?'#2a3340':'#ccc';ctx.lineWidth=0.5;
+  rr(ctx,hx,hy,hw,hh,8);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(hx+10,hy+hh-8);
+  for(let xi=0;xi<=120;xi++){
+    const xv=xi*2,yv=100*(xv*xv)/(14400+xv*xv);
+    ctx.lineTo(hx+10+(xi/120)*(hw-20),hy+hh-8-(yv/hh)*(hh-16));
+  }
+  ctx.strokeStyle='#7F77DD';ctx.lineWidth=1.5;ctx.setLineDash([]);ctx.stroke();
+  ctx.fillStyle=isDark()?'#888':'#777';ctx.font='9px sans-serif';ctx.textAlign='center';ctx.textBaseline='top';
+  ctx.fillText('señal pequeña → respuesta baja     señal grande → satura en 100',hx+hw/2,hy+hh+4);
+  ctx.restore();
+
+  drawPulses(ctx,'c3',NM);
+  Object.keys(NM).forEach(k=>drawNode(ctx,NM[k],PAL[k]||PAL.z0,getAct(k,imu,d1,d2)));
+  drawBars(ctx,W,H);
+}
+
+function drawPage4(imu,d1,d2){
+  const{ctx,W,H}=makeCanvas('c4');if(!ctx)return;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=getBg();ctx.fillRect(0,0,W,H);
+  const NM={
+    z3:{x:90,y:95,r:26,label:'Z₃',sub:'STOP'},
+    z5:{x:260,y:70,r:24,label:'Z₅',sub:'oscA'},
+    z6:{x:260,y:135,r:24,label:'Z₆',sub:'oscB'},
+    mi:{x:430,y:70,r:26,label:'M₁',sub:'izq'},
+    md:{x:430,y:135,r:26,label:'M₂',sub:'der'},
+  };
+  drawWire(ctx,NM.z5,NM.mi,{color:PAL.mi.fill,w:2,alpha:wA('z5',imu,d1,d2)});
+  drawWire(ctx,NM.z6,NM.md,{color:PAL.md.fill,w:2,alpha:wA('z6',imu,d1,d2)});
+  drawInhibitLine(ctx,NM.z3,NM.mi,{alpha:wA('z3',imu,d1,d2)});
+  drawInhibitLine(ctx,NM.z3,NM.md,{alpha:wA('z3',imu,d1,d2)});
+  const states=[
+    {x:520,y:55,w:155,h:34,lbl:'RECTO',sub:'vIzq=150 vDer=150',c:isDark()?'#085041':'#E1F5EE',tc:isDark()?'#9FE1CB':'#085041'},
+    {x:520,y:97,w:155,h:34,lbl:'GIRANDO',sub:'vIzq=+200 vDer=−200',c:isDark()?'#633806':'#FAEEDA',tc:isDark()?'#FAC775':'#633806'},
+    {x:520,y:139,w:155,h:34,lbl:'RUGOSO',sub:'vIzq=150 vDer=150',c:isDark()?'#3C3489':'#EEEDFE',tc:isDark()?'#CECBF6':'#3C3489'},
+  ];
+  states.forEach(s=>{
+    ctx.fillStyle=s.c;ctx.strokeStyle=s.tc;ctx.lineWidth=1;rr(ctx,s.x,s.y,s.w,s.h,8);ctx.fill();ctx.stroke();
+    ctx.fillStyle=s.tc;ctx.font='500 11px sans-serif';ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText(s.lbl,s.x+s.w/2,s.y+5);
+    ctx.font='400 9px sans-serif';ctx.fillText(s.sub,s.x+s.w/2,s.y+20);
+  });
+  annotate(ctx,(NM.z5.x+NM.mi.x)/2,NM.z5.y-18,'excita (Z₅ → M₁)',isDark()?'#9FE1CB':'#0F6E56');
+  annotate(ctx,(NM.z3.x+NM.mi.x)/2+30,NM.z3.y+32,'inhibe si Z₃>60',isDark()?'#F0997B':'#D85A30');
+  drawPulses(ctx,'c4',NM);
+  Object.keys(NM).forEach(k=>drawNode(ctx,NM[k],PAL[k]||PAL.z0,getAct(k,imu,d1,d2)));
+  drawBars(ctx,W,H);
+}
+
+function drawPage5(imu,d1,d2){
+  const{ctx,W,H}=makeCanvas('c5');if(!ctx)return;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=getBg();ctx.fillRect(0,0,W,H);
+  const NM={
+    imu:{x:52,y:80,r:20,label:'IMU',sub:''},
+    us1:{x:52,y:133,r:20,label:'US1',sub:''},
+    us2:{x:52,y:184,r:20,label:'US2',sub:''},
+    z0:{x:168,y:80,r:22,label:'Z₀',sub:'terreno'},
+    z1:{x:168,y:133,r:20,label:'Z₁',sub:'prox'},
+    z2:{x:168,y:184,r:20,label:'Z₂',sub:'prox'},
+    z3:{x:282,y:157,r:24,label:'Z₃',sub:'STOP'},
+    z4:{x:282,y:80,r:20,label:'Z₄',sub:'conv.'},
+    mem:{x:400,y:48,r:22,label:'MEM',sub:'τ60'},
+    z5:{x:505,y:80,r:22,label:'Z₅',sub:'oscA'},
+    z6:{x:505,y:157,r:22,label:'Z₆',sub:'oscB'},
+    mi:{x:620,y:80,r:22,label:'M₁',sub:'izq'},
+    md:{x:620,y:157,r:22,label:'M₂',sub:'der'},
+  };
+  drawDash(ctx,28,55,100,148,'sensores');
+  drawOscArc(ctx,505,118,60);
+  drawWire(ctx,NM.imu,NM.z0,{color:PAL.imu.fill,w:1.5,alpha:wA('imu',imu,d1,d2)});
+  drawWire(ctx,NM.us1,NM.z1,{color:PAL.us1.fill,w:1.5,alpha:wA('us1',imu,d1,d2)});
+  drawWire(ctx,NM.us2,NM.z2,{color:PAL.us2.fill,w:1.5,alpha:wA('us2',imu,d1,d2)});
+  drawWire(ctx,NM.z0,NM.z4,{color:PAL.z0.fill,w:1.2,alpha:wA('z0',imu,d1,d2)});
+  drawWire(ctx,NM.z1,NM.z4,{color:PAL.z1.fill,w:1,alpha:wA('z1',imu,d1,d2)});
+  drawWire(ctx,NM.z2,NM.z4,{color:PAL.z2.fill,w:1,alpha:wA('z2',imu,d1,d2)});
+  drawWire(ctx,NM.z1,NM.z3,{color:PAL.z1.fill,w:1,alpha:wA('z1',imu,d1,d2)});
+  drawWire(ctx,NM.z2,NM.z3,{color:PAL.z2.fill,w:1,alpha:wA('z2',imu,d1,d2)});
+  drawWire(ctx,NM.z0,NM.mem,{color:PAL.z0.fill,w:1.2,alpha:wA('z0',imu,d1,d2)});
+  drawWire(ctx,NM.mem,NM.z5,{color:PAL.mem.fill,w:1.2,alpha:wA('mem',imu,d1,d2)});
+  drawWire(ctx,NM.mem,NM.z6,{color:PAL.mem.fill,w:1.2,alpha:wA('mem',imu,d1,d2)});
+  drawWire(ctx,NM.z5,NM.mi,{color:PAL.mi.fill,w:2,alpha:wA('z5',imu,d1,d2)});
+  drawWire(ctx,NM.z6,NM.md,{color:PAL.md.fill,w:2,alpha:wA('z6',imu,d1,d2)});
+  drawInhibitLine(ctx,NM.z3,NM.mi,{alpha:wA('z3',imu,d1,d2)});
+  drawInhibitLine(ctx,NM.z3,NM.md,{alpha:wA('z3',imu,d1,d2)});
+  drawInhibitLine(ctx,NM.z4,NM.z5,{alpha:wA('z4',imu,d1,d2)});
+  drawInhibitLine(ctx,NM.z4,NM.z6,{alpha:wA('z4',imu,d1,d2)});
+  drawWire(ctx,NM.z5,NM.z6,{color:PAL.z5.fill,w:1,curve:[26,30,-26,-30],alpha:.3});
+  drawWire(ctx,NM.z6,NM.z5,{color:PAL.z6.fill,w:1,curve:[-26,-30,26,30],alpha:.3,noArrow:true});
+  drawPulses(ctx,'c5',NM);
+  Object.keys(NM).forEach(k=>drawNode(ctx,NM[k],PAL[k]||PAL.z0,getAct(k,imu,d1,d2)));
+  drawMotorPanel(ctx,W,H,getVizq(),getVder());
+  drawBars(ctx,W,H);
+}
+
+function updateEstado5(imu){
+  const el=document.getElementById('s5estado');if(!el)return;
+  const imuDetect=imu>0;
+  if(Z[3]>60){robotState='STOP';el.textContent='STOP — z[3]='+Z[3].toFixed(0);el.className='stato stop';}
+  else{
+    if(robotState==='STOP')robotState='RECTO';
+    if(robotState==='RECTO'&&imuDetect){simYawStart=simYaw;robotState='GIRANDO';}
+    if(robotState==='GIRANDO'){simYaw+=0.5;if(Math.abs(simYaw-simYawStart)>=45)robotState='CRUCERO_RUGOSO';}
+    if(robotState==='CRUCERO_RUGOSO'&&!imuDetect){robotState='RECTO';simYaw=0;}
+    if(robotState==='GIRANDO'){el.textContent='GIRANDO — '+Math.abs(simYaw-simYawStart).toFixed(0)+'° / 45°';el.className='stato giro';}
+    else if(robotState==='CRUCERO_RUGOSO'){el.textContent='CRUCERO RUGOSO';el.className='stato giro';}
+    else{el.textContent='OPERATIVO — RECTO';el.className='stato ok';}
+  }
+}
+
+document.getElementById('b5reset').addEventListener('click',()=>{
+  Z=[0,0,0,0,0,0,0];MEM=0;Object.keys(allPulses).forEach(k=>allPulses[k]=[]);simYaw=0;simYawStart=0;robotState='RECTO';
+});
+
+function loop(){
+  const p5=getP5();
+  const imu=cur===5?p5.imu:0;
+  const d1=cur===5?p5.d1:100;
+  const d2=cur===5?p5.d2:100;
+  for(let i=0;i<3;i++) neuroStep(imu,d1,d2);
+  const cid='c'+cur;
+  spawnFor(cid,imu,d1,d2);
+  if(cur===0) drawPage0(imu,d1,d2);
+  else if(cur===1) drawPage1(imu,d1,d2);
+  else if(cur===2) drawPage2(imu,d1,d2);
+  else if(cur===3) drawPage3(imu,d1,d2);
+  else if(cur===4) drawPage4(imu,d1,d2);
+  else if(cur===5){drawPage5(p5.imu,p5.d1,p5.d2);updateEstado5(p5.imu);}
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
